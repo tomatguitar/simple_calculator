@@ -1,5 +1,5 @@
 #custom
-/scss
+**/scss/
 **/*.scss
 package.json
 package-lock.json
