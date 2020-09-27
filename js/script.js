@@ -1,101 +1,242 @@
-const numbers = document.querySelectorAll(".number");
-const operators = document.querySelectorAll(".operator");
-const decimalDot = document.querySelector("#decimal");
-const clearBtns = document.querySelectorAll(".clear-btn");
-const ce = document.querySelector("#ce");
-const c = document.querySelector("#c");
-const result = document.querySelector("#result");
-const display = document.getElementById("display");
-let currentMemoryNumber = 0;
-let IsNewMemoryNumber = false;
-let pendingMemoryOperation = "";
+const MAX_DISPLAY_LENGTH = 12;
+const MAX_RESULT = 999999999999.0;
+const MIN_RESULT = -999999999999.0;
 
-const addButtonsEventListener = (event, cb, buttons) => {
-   for (let i = 0; i < buttons.length; i++) {
-    let button = buttons[i];
-    button.addEventListener(event, (e) => {
-      cb(e.target.innerText);
-    });
+class Calculator {
+  constructor(previousOperandTextElement, currentOperandTextElement) {
+    this.previousOperandTextElement = previousOperandTextElement;
+    this.currentOperandTextElement = currentOperandTextElement;
+    this.readyToReset = false;
+    this.clear();
   }
-};
 
-const addDecimalDotEventListener = (event, cb, button) => {
-  let buttonValue = button.innerText;
-  button.addEventListener(event, () => cb(buttonValue));
-};
+  clear() {
+    this.currentOperand = "0";
+    this.previousOperand = "";
+    this.operation = undefined;
+  }
 
-const onNumButtonClick = (number) => {
-  if (IsNewMemoryNumber) {
-    display.value = number;
-    IsNewMemoryNumber = false;
-  } else {
-    if (display.value === "0") {
-      display.value = number;
+  delete() {
+    if (this.currentOperand < 0) {
+      if (this.currentOperand.toString().length > 2) {
+        this.currentOperand = this.currentOperand.toString().slice(0, -1);
+      } else {
+        this.currentOperand = "0";
+      }
     } else {
-      display.value += number;
+      if (this.currentOperand.toString().length >= 2) {
+        this.currentOperand = this.currentOperand.toString().slice(0, -1);
+      } else {
+        this.currentOperand = "0";
+      }
     }
   }
-};
 
-const onOperatorButtonClick = (operator) => {
-  let localOperationMemory = display.value;
-  if (IsNewMemoryNumber && pendingMemoryOperation !== "=") {
-    display.value = currentMemoryNumber;
-  } else {
-    IsNewMemoryNumber = true;
-    if (pendingMemoryOperation === "+") {
-      currentMemoryNumber += +localOperationMemory;
-    } else if (pendingMemoryOperation === "-") {
-      currentMemoryNumber -= +localOperationMemory;
-    } else if (pendingMemoryOperation === "/") {
-      currentMemoryNumber /= +localOperationMemory;
-    } else if (pendingMemoryOperation === "*") {
-      currentMemoryNumber *= +localOperationMemory;
+  appendNumber(number) {
+    let emptyOperand = "";
+    if (this.currentOperand.length < MAX_DISPLAY_LENGTH) {
+      if (
+        (number === "." && this.currentOperand.includes(".")) ||
+        (this.currentOperand === "0" && number === "0")
+      )
+        return;
+
+      if (
+        this.currentOperand.length === 1 &&
+        this.currentOperand === "0" &&
+        number !== "0" &&
+        number !== "."
+      )
+        this.currentOperand = emptyOperand;
+
+      this.currentOperand = this.currentOperand.toString() + number.toString();
     } else {
-      currentMemoryNumber = +localOperationMemory;
-    }
-
-    display.value = currentMemoryNumber;
-    pendingMemoryOperation = operator;
-  }
-};
-
-const onDecimalDotButtonClick = () => {
-  let localDecimalMemory = display.value;
-
-  if (IsNewMemoryNumber) {
-    localDecimalMemory = "0.";
-    IsNewMemoryNumber = false;
-  } else {
-    if (localDecimalMemory.indexOf(".") === -1) {
-      localDecimalMemory += ".";
+      this.currentOperand = this.currentOperand;
     }
   }
-  display.value = localDecimalMemory;
-};
 
-const onClearButtonsClick = (id) => {
-  if (id == "CE") {
-    clearMemory();
-    console.log(id);
-  } else if (id == "C") {
-    clearDisplay();
+  chooseOperation(operation) {
+    if (this.currentOperand === "" || this.currentOperand === 0) return;
+    if (this.currentOperand !== "" && this.previousOperand !== "") {
+      this.compute();
+    }
+    this.operation = operation;
+    this.previousOperand = this.currentOperand;
+    this.currentOperand = "";
   }
-};
 
-const clearMemory = () => {
-  display.value = "0";
-  currentMemoryNumber = 0;
-  IsNewMemoryNumber = true;
-  pendingMemoryOperation = "";
-};
+  compute() {
+    let computation;
+    const prev = parseFloat(this.previousOperand);
+    const current = parseFloat(this.currentOperand);
+    if (isNaN(prev) || isNaN(current)) return;
+    switch (this.operation) {
+      case "+":
+        computation = prev + current;
+        break;
+      case "-":
+        computation = prev - current;
+        break;
+      case "*":
+        computation = prev * current;
+        break;
+      case "÷":
+          computation = prev / current;
+        break;
+      case "pow":
+          computation = Math.pow(prev, current);
+      case "root":
+        computation = Math.pow(prev, 1 / current);
+        break;
+      default:
+        return;
+    }
+    this.readyToReset = true;
 
-const clearDisplay = () => {
-  display.value = "0";
-  IsNewMemoryNumber = true;
-};
+    this.checkResultIsCorrect(computation)
+      ? (this.currentOperand = +computation.toFixed(12))
+      : this.generateErrorMessage();
 
-addButtonsEventListener("click", onNumButtonClick, numbers);
-addButtonsEventListener("click", onOperatorButtonClick, operators);
-addButtonsEventListener("click", onClearButtonsClick, clearBtns);
-addDecimalDotEventListener("click", onDecimalDotButtonClick, decimalDot);
+    this.operation = undefined;
+    this.previousOperand = "";
+  }
+
+  getDisplayNumber(number) {
+    const stringNumber = number.toString();
+    const integerDigits = parseFloat(stringNumber.split(".")[0]);
+    const decimalDigits = stringNumber.split(".")[1];
+    let integerDisplay;
+    if (isNaN(integerDigits)) {
+      integerDisplay = "";
+    } else {
+      integerDisplay = integerDigits.toLocaleString("en", {
+        maximumFractionDigits: 0,
+      });
+    }
+    if (decimalDigits != null) {
+      return `${integerDisplay}.${decimalDigits}`;
+    } else {
+      return integerDisplay;
+    }
+  }
+
+  updateDisplay() {
+    this.currentOperandTextElement.innerText = this.getDisplayNumber(
+      this.currentOperand
+    );
+    if (this.operation != null) {
+      this.previousOperandTextElement.innerText = `${this.getDisplayNumber(
+        this.previousOperand
+      )} ${this.operation}`;
+    } else {
+      this.previousOperandTextElement.innerText = "";
+    }
+  }
+
+  invertSign() {
+    if (parseFloat(this.currentOperand) > 0) {
+      this.currentOperand = `-${this.currentOperand}`;
+    } else if (parseFloat(this.currentOperand) < 0) {
+      this.currentOperand = this.currentOperand.slice(1);
+    }
+  }
+
+  checkResultIsCorrect(result) {
+    if (
+      (isNaN(result) && this.operation === "÷") ||
+      (isNaN(result) && this.operation === "root")
+    ) {
+      this.errorMessage = "Ошибка!";
+      return false;
+    } else if (isNaN(result) && this.operation === "pow") {
+      this.errorMessage = "Недопустимый ввод!";
+      return false;
+    } else if (!isFinite(result) && this.operation === "÷") {
+      this.errorMessage = "Бесконечность!";
+      return false;
+    } else if (result > MAX_RESULT || result < MIN_RESULT) {
+      this.errorMessage = "Предел вычисления!";
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  generateErrorMessage() {
+    errorScreen.textContent = this.errorMessage;
+    this.showErrorMessage();
+    this.clear();
+  }
+
+  showErrorMessage() {
+    errorScreen.classList.add("error-screen--visible");
+  }
+
+  hideErrorMessage() {
+    errorScreen.classList.remove("error-screen--visible");
+  }
+}
+
+const numberButtons = document.querySelectorAll("[data-number]");
+const operationButtons = document.querySelectorAll("[data-operation]");
+const equalsButton = document.querySelector("[data-equals]");
+const deleteButton = document.querySelector("[data-delete]");
+const allClearButton = document.querySelector("[data-all-clear]");
+const invertSignNumberButton = document.querySelector("[data-invertion]");
+const previousOperandTextElement = document.querySelector(
+  "[data-previous-operand]"
+);
+const currentOperandTextElement = document.querySelector(
+  "[data-current-operand]"
+);
+const errorScreen = document.querySelector(".error-screen");
+
+const calculator = new Calculator(
+  previousOperandTextElement,
+  currentOperandTextElement
+);
+
+numberButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    if (
+      calculator.previousOperand === "" &&
+      calculator.currentOperand !== "" &&
+      calculator.readyToReset
+    ) {
+      calculator.currentOperand = "";
+      calculator.readyToReset = false;
+    }
+    calculator.appendNumber(button.innerText);
+    calculator.updateDisplay();
+  });
+});
+
+operationButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    calculator.chooseOperation(button.innerText);
+    calculator.updateDisplay();
+  });
+});
+
+equalsButton.addEventListener("click", (button) => {
+  calculator.compute();
+  calculator.updateDisplay();
+});
+
+allClearButton.addEventListener("click", (button) => {
+  calculator.hideErrorMessage();
+  calculator.clear();
+  calculator.updateDisplay();
+});
+
+deleteButton.addEventListener("click", (button) => {
+  calculator.delete();
+  calculator.updateDisplay();
+});
+
+invertSignNumberButton.addEventListener("click", (button) => {
+  if (calculator.currentOperand !== "" || calculator.currentOperand !== "0") {
+    calculator.invertSign();
+    calculator.updateDisplay();
+  }
+});

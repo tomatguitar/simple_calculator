@@ -1,141 +1,138 @@
-body {
-  height: 100%;
-  font-size: 20px;
-  background-color: #eee;
-  widows: 100%;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  font-weight: normal;
+  font-family: Gotham Rounded, sans-serif;
 }
 
-header {
-  position: fixed;
+b {
+  font-weight: 700;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to right, #00aaff, #00ff6c);
+}
+
+.visually-hidden:not(:focus):not(:active) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip: rect(0 0 0 0);
+
+  clip-path: inset(100%);
+}
+
+.description {
+  align-self: flex-start;
+  width: 500px;
+  margin-top: 100px;
+  padding-right: 10px;
+  padding-left: 10px;
+  background: cornflowerblue;
+}
+
+.description h2 {
+  font-weight: 700;
+  font-size: 1.5em;
+  text-align: center;
+}
+
+.description p {
+  text-align: justify;
+}
+
+.description p:last-child {
+  font-weight: 600;
+  text-align: center;
+}
+
+.description span {
+  display: block;
+  margin-bottom: 0;
+  font-weight: 700;
+  text-align: center;
+  background: coral;
+}
+
+.calculator-grid {
+  display: grid;
+  grid-template-rows: minmax(120px, auto) repeat(6, 100px);
+  grid-template-columns: repeat(4, 100px);
+  align-content: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.calculator-grid > button {
+  font-size: 2rem;
+  background-color: rgba(255, 255, 255, 0.75);
+  border: 1px solid white;
+  outline: none;
+  cursor: pointer;
+}
+
+.calculator-grid > button:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.col-span-two {
+  grid-column: span 2;
+}
+
+.row-span-two {
+  grid-row: span 2;
+}
+
+.output {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  grid-column: 1 / -1;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding: 10px;
+  word-wrap: break-word;
+  word-break: break-all;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.output .previous-operand {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 1.5rem;
+}
+
+.output .current-operand {
+  color: white;
+  font-size: 2.5rem;
+}
+
+.output .error-screen {
+  position: absolute;
   top: 0;
   left: 0;
-}
-
-.container {
-  width: 650px;
-  margin: 0 auto;
-  padding: 80px 15px 40px;
-}
-
-.calc {
-  width: 385px;
-  margin: 20px auto;
-  padding: 30px;
-  background-color: #ee4d1c;
-  border-radius: 6px;
-}
-
-.calc-display-input {
-  width: 360px;
-  height: 60px;
-  margin: 20px 0;
-  padding: 10px;
-  color: #fff;
-  font-size: 35px;
+  width: 100%;
+  height: 100%;
+  padding-top: 51px;
+  padding-right: 12px;
+  color: white;
+  font-size: 2.5em;
   text-align: right;
-  background-color: #1d1d1d;
-  border-radius: 6px;
+  background: red;
+  opacity: 0;
+  transition: opacity;
 }
 
-.calc_button-row td {
-  margin: 0 auto;
-  padding: 5px;
-}
-
-.btn {
-  width: 85px;
-  height: 60px;
-  padding: 0;
-  color: #666666;
-  font-size: 27px;
-  text-transform: uppercase;
-  background-color: #f4f4f4;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.1s all;
-}
-
-.btn-hover-red:hover {
-  color: #f2f2f2;
-  background-color: #d83e33;
-}
-
-.btn-hover-orange:hover {
-  color: #f2f2f2;
-  background-color: #ff6a00;
-}
-
-.btn-hover-green:hover {
-  color: #f2f2f2;
-  background-color: green;
-}
-
-.btn:active {
-  box-shadow: 0px 1px #ccc;
-  transform: translateY(-1px);
-}
-
-.btn-long {
-  width: 183px;
-}
-
-.btn-equal {
-  height: 145px;
-}
-
-input,
-button {
-  margin: 10px;
-  padding: 5px 15px;
-  border: 1px grey solid;
-  border-radius: 4px;
-}
-
-button {
-  margin-left: 0;
-  padding: 15px 24px;
-}
-
-@media screen and (max-width: 768px) {
-  .calc {
-    width: 300px;
-    margin: 0 auto;
-  }
-  .calc-display-input {
-    width: 280px;
-  }
-
-  input[placeholder] {
-    font-size: 28px;
-  }
-  input::-moz-placeholder {
-    font-size: 28px;
-  }
-  input:-moz-placeholder {
-    font-size: 28px;
-  }
-  input:-ms-input-placeholder {
-    font-size: 28px;
-  }
-
-  .btn {
-    width: 64px;
-  }
-  .btn-long {
-    width: 140px;
-  }
-}
-@media screen and (max-width: 400px) {
-  .calc {
-    width: 280px;
-  }
-  .calc-display-input {
-    width: 260px;
-  }
-  .btn {
-    width: 60px;
-  }
-  .btn-long {
-    width: 132px;
-  }
+.output .error-screen--visible {
+  opacity: 1;
 }

@@ -1,152 +1,78 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>calculator1</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Calculator</title>
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
   </head>
-
   <body>
-    <main>
-      <div class="container">
-        <div class="calc">
-          <div class="calc-display">
-            <input
-              disabled
-              type="text"
-              id="display"
-              value="0"
-              name=""
-              placeholder="000000000000000000"
-              class="calc-display-input"
-            />
-          </div>
-          <div class="calc-buttons">
-            <table class="calc-table">
-              <tr class="calc-buttons-row">
-                <td>
-                  <button
-                    type="button"
-                    class="clear-btn btn btn-hover-red"
-                    id="ce"
-                  >
-                    ce
-                  </button>
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    class="clear-btn btn btn-hover-red"
-                    id="c"
-                  >
-                    c
-                  </button>
-                </td>
-                <td>
-                  <button type="button" class="operator btn btn-hover-orange">
-                    /
-                  </button>
-                </td>
-                <td>
-                  <button type="button" class="operator btn btn-hover-orange">
-                    *
-                  </button>
-                </td>
-              </tr>
-              <tr class="calc-buttons-row">
-                <td>
-                  <button type="button" class="number btn-hover-green btn">
-                    7
-                  </button>
-                </td>
-                <td>
-                  <button type="button" class="number btn-hover-green btn">
-                    8
-                  </button>
-                </td>
-                <td>
-                  <button type="button" class="number btn-hover-green btn">
-                    9
-                  </button>
-                </td>
-                <td>
-                  <button type="button" class="operator btn btn-hover-orange">
-                    -
-                  </button>
-                </td>
-              </tr>
-              <tr class="calc-buttons-row">
-                <td>
-                  <button type="button" class="number btn-hover-green btn">
-                    4
-                  </button>
-                </td>
-                <td>
-                  <button type="button" class="number btn-hover-green btn">
-                    5
-                  </button>
-                </td>
-                <td>
-                  <button type="button" class="number btn-hover-green btn">
-                    6
-                  </button>
-                </td>
-                <td>
-                  <button type="button" class="operator btn btn-hover-orange">
-                    +
-                  </button>
-                </td>
-              </tr>
-              <tr class="calc-buttons-row">
-                <td>
-                  <button type="button" class="number btn-hover-green btn">
-                    1
-                  </button>
-                </td>
-                <td>
-                  <button type="button" class="number btn-hover-green btn">
-                    2
-                  </button>
-                </td>
-                <td>
-                  <button type="button" class="number btn-hover-green btn">
-                    3
-                  </button>
-                </td>
-                <td rowspan="2">
-                  <button
-                    type="button"
-                    class="operator btn btn-equal btn-hover-orange"
-                    id="result"
-                  >
-                    =
-                  </button>
-                </td>
-              </tr>
-              <tr class="calc-buttons-row">
-                <td colspan="2">
-                  <button
-                    type="button"
-                    class="number btn-hover-green btn btn-long"
-                  >
-                    0
-                  </button>
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    class="btn btn-hover-orange"
-                    id="decimal"
-                  >
-                    .
-                  </button>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
+    <h1 class="visually-hidden">Calculator</h1>
+    <div class="description">
+      <h2>Пояснения к работе калькулятора</h2>
+      <p>
+        Для переключения знака у текущего числа используйте отдельную кнопку
+        "<b>+\-</b>".
+      </p>
+      <p>
+        Для очистки дисплея от ошибки или полной очистки памяти калькулятора
+        иcпользуйте кнопку "<b>AC</b>".
+      </p>
+      <p>
+        Для удаления отдельной цифры текущего числа иcпользуйте кнопку
+        "<b>DEL</b>".
+      </p>
+      <p>
+        Для возведения в произвольную степень используйте кнопку "<b>pow</b>".
+        Сначала введите первое число, которое будет возводится в степень.Затем
+        нажмите кнопку "<b>pow</b>". После этого введите второе число, которое
+        является степенью первого числа. <br />
+        <span>"число 1" --> "pow" --> "число 2" => результат</span>
+      </p>
+      <p>
+        Для вычисления корня с произвольным показателем используйте кнопку
+        "<b>root</b>". Сначала введите первое число, из которого будет
+        извлекаться корень.Затем нажмите кнопку "<b>pow</b>". После этого
+        введите второе число, которое является показателем данного корня. <br />
+        <span>"число 1" --> "root" --> "число 2" => результат</span>
+      </p>
+      <p>
+        Ошибки ввода или вычисления выводятся на дисплей калькулятора после
+        полного ввода выражения.<br />
+        <span>"-9" --> "root" --> " 2" => Ошибка!</span>
+        <span>"2" --> "/" --> " 0" => Бесконечность!</span>
+      </p>
+      <p>Приятного пользования и тестирования :)</p>
+    </div>
+    <div class="calculator-grid">
+      <div class="output">
+        <div data-previous-operand class="previous-operand"></div>
+        <div data-current-operand class="current-operand">0</div>
+        <div class="error-screen"></div>
       </div>
-    </main>
-    <script src="js/script.js"></script>
+      <button data-all-clear>AC</button>
+      <button data-delete>DEL</button>
+      <button data-operation>pow</button>
+      <button data-operation>root</button>
+      <button data-invertion>+/-</button>
+      <button data-operation>÷</button>
+      <button data-operation>*</button>
+      <button data-operation>-</button>
+      <button data-number>1</button>
+      <button data-number>2</button>
+      <button data-number>3</button>
+      <button data-operation class="row-span-two">+</button>
+      <button data-number>4</button>
+      <button data-number>5</button>
+      <button data-number>6</button>
+      <button data-number>7</button>
+      <button data-number>8</button>
+      <button data-number>9</button>
+      <button data-equals class="row-span-two">=</button>
+      <button data-number class="col-span-two">0</button>
+      <button data-number>.</button>
+    </div>
   </body>
 </html>
